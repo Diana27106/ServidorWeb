@@ -1,26 +1,39 @@
-name: Docker Dev Build
+name: Deploy to AWS EC2
 
 on:
   push:
-    branches:
-      - main
-      - develop
+    branches: [develop, main]
 
 jobs:
-  build:
+  deploy:
     runs-on: ubuntu-latest
 
     steps:
-      - name: Checkout repo
-        uses: actions/checkout@v6.0.1
+      - uses: actions/checkout@v4
 
-      - name: Build Docker image
-        run: docker build -t web-dev .
+      - name: Build image
+        run: docker build -t web-prod -f docker/Dockerfile .
 
-      - name: Run container
-        run: docker run -d -p 8080:80 web-dev
+      - name: Save image
+        run: docker save web-prod | gzip > web-prod.tar.gz
 
-      - name: Test web server
-        run: |
-          sleep 5
-          curl -I http://localhost:8080
+      - name: Copy image to EC2
+        uses: appleboy/scp-action@v0.1.7
+        with:
+          host: ${{ secrets.EC2_HOST }}
+          username: ${{ secrets.EC2_USER }}
+          key: ${{ secrets.EC2_SSH_KEY }}
+          source: "web-prod.tar.gz"
+          target: "~"
+
+      - name: Deploy on EC2
+        uses: appleboy/ssh-action@v1.0.3
+        with:
+          host: ${{ secrets.EC2_HOST }}
+          username: ${{ secrets.EC2_USER }}
+          key: ${{ secrets.EC2_SSH_KEY }}
+          script: |
+            docker load < web-prod.tar.gz
+            docker stop web || true
+            docker rm web || true
+            docker run -d -p 80:80 --name web web-prod
