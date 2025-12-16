@@ -2,7 +2,9 @@ name: Docker Dev Build
 
 on:
   push:
-    branches: [main, develop]
+    branches:
+      - main
+      - develop
 
 jobs:
   build:
@@ -10,10 +12,10 @@ jobs:
 
     steps:
       - name: Checkout repo
-        uses: actions/checkout@v4
+        uses: actions/checkout@v6.0.1
 
       - name: Build Docker image
-        run: docker build -t web-dev -f docker/Dockerfile .
+        run: docker build -t web-dev .
 
       - name: Run container
         run: docker run -d -p 8080:80 web-dev
