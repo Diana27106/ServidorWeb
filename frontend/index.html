@@ -4,24 +4,37 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Cine | Mis Películas</title>
+    <title>Cine Futurista | NeoList</title>
     <link rel="stylesheet" href="style.css">
+    <link
+        href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700&family=Rajdhani:wght@300;500&display=swap"
+        rel="stylesheet">
 </head>
 
 <body>
-    <div class="container">
-        <h1>🍿 Mis Películas Favoritas</h1>
+    <div class="background-overlay"></div>
 
-        <form id="formularioPelicula">
-            <input type="text" id="nombrePelicula" placeholder="Ej. Interestellar, El Padrino..." required>
-            <button type="submit">Añadir a la Lista</button>
+    <div class="container">
+        <header>
+            <h1><span class="glitch">CINEMA</span> <span class="neon-text">NEO-LIST</span></h1>
+            <p class="subtitle">DATABASE SYSTEM v2.0</p>
+        </header>
+
+        <section class="trending-section">
+            <h3>🔥 Tendencias del Año</h3>
+            <div id="trendingMovies" class="trending-grid">
+            </div>
+        </section>
+
+        <form id="formularioPelicula" class="input-group">
+            <input type="text" id="nombrePelicula" placeholder="Escanear título de película..." required>
+            <button type="submit">Añadir</button>
         </form>
 
-        <hr>
-
-        <h2>Lista Actual</h2>
-        <ul id="listaPeliculas">
-        </ul>
+        <div class="list-container">
+            <h2>Lista de Visionado</h2>
+            <ul id="listaPeliculas"></ul>
+        </div>
     </div>
 
     <script src="script.js"></script>

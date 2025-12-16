@@ -1,48 +1,55 @@
-// 1. Obtener referencias a los elementos del DOM
 const formulario = document.getElementById('formularioPelicula');
 const inputPelicula = document.getElementById('nombrePelicula');
 const listaPeliculas = document.getElementById('listaPeliculas');
+const trendingGrid = document.getElementById('trendingMovies');
 
-// 2. Función que se ejecuta cuando se envía el formulario
-formulario.addEventListener('submit', function (e) {
-    // Evitar que la página se recargue (comportamiento por defecto del formulario)
+// 1. Datos de películas del año (Simulado)
+const topMovies = [
+    { titulo: "Dune: Part Two", año: 2024 },
+    { titulo: "Furiosa", año: 2024 },
+    { titulo: "Deadpool & Wolverine", año: 2024 },
+    { titulo: "Joker: Folie à Deux", año: 2024 }
+];
+
+// 2. Renderizar sugerencias
+function cargarTendencias() {
+    topMovies.forEach(movie => {
+        const card = document.createElement('div');
+        card.className = 'movie-card';
+        card.innerHTML = `
+            <div>${movie.titulo}</div>
+            <small style="color: #00f2ff">${movie.año}</small>
+        `;
+        card.onclick = () => agregarPelicula(movie.titulo);
+        trendingGrid.appendChild(card);
+    });
+}
+
+// 3. Manejar Formulario
+formulario.addEventListener('submit', (e) => {
     e.preventDefault();
-
-    // Obtener el valor del input y limpiarlo de espacios extra
     const nombre = inputPelicula.value.trim();
-
-    // Verificar que el campo no esté vacío
-    if (nombre !== "") {
+    if (nombre) {
         agregarPelicula(nombre);
-
-        // Limpiar el input después de agregar la película
         inputPelicula.value = '';
     }
 });
 
-// 3. Función para crear el elemento de la lista y añadirlo al DOM
+// 4. Agregar a la lista con animación
 function agregarPelicula(nombre) {
-    // Crear el nuevo elemento de lista <li>
-    const nuevoElementoLista = document.createElement('li');
-
-    // Asignar el contenido: el nombre de la película
-    nuevoElementoLista.innerHTML = `
+    const li = document.createElement('li');
+    li.innerHTML = `
         <span>${nombre}</span>
-        <button class="btn-eliminar">❌</button>
+        <button class="btn-eliminar" onclick="eliminar(this)">DELETE</button>
     `;
-
-    // Añadir el listener al botón de eliminar
-    const botonEliminar = nuevoElementoLista.querySelector('.btn-eliminar');
-    botonEliminar.addEventListener('click', function () {
-        // Eliminar el elemento padre (el <li> completo)
-        nuevoElementoLista.remove();
-    });
-
-    // Añadir el nuevo elemento a la lista desordenada (<ul>) en el DOM
-    listaPeliculas.appendChild(nuevoElementoLista);
+    listaPeliculas.prepend(li); // Añade al principio
 }
 
-// Opcional: Agregar algunas películas de ejemplo al cargar la página
-agregarPelicula("Pulp Fiction");
-agregarPelicula("Matrix");
-agregarPelicula("Parásitos");
+function eliminar(btn) {
+    const item = btn.parentElement;
+    item.style.animation = "slideIn 0.3s ease-in reverse forwards";
+    setTimeout(() => item.remove(), 300);
+}
+
+// Inicializar
+cargarTendencias();
