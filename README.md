@@ -104,7 +104,7 @@ jobs:
 Ahora SÍ:
 
 ```
-http://IP_PUBLICA_EC2
+http://18.204.80.93
 ```
 
 Y ves tu `index.html`.
