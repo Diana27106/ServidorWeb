@@ -1,51 +1,21 @@
-name: Nginx CI/CD (Desarrollo)
+name: Docker Dev Build
 
 on:
-  # 🎯 Cambiar el trigger a la rama de desarrollo
   push:
-    branches: [ develop ] 
-  pull_request:
-    branches: [ develop ]
+    branches:
+      - main
+      - develop
 
 jobs:
-  build-and-deploy:
-    # Usar una máquina más potente si la construcción es lenta
+  build:
     runs-on: ubuntu-latest
-    
+
     steps:
-    - uses: actions/checkout@v3
-    
-    - name: Set up Docker Buildx
-      uses: docker/setup-buildx-action@v2
-      
-    # Omitir el Login a Docker Hub si solo se despliega localmente en el servidor de desarrollo.
-    # Si quieres persistir la imagen en Docker Hub:
-    - name: Login to Docker Hub
-      uses: docker/login-action@v2
-      with:
-        username: ${{ secrets.DOCKER_USERNAME }}
-        password: ${{ secrets.DOCKER_TOKEN }}
-        
-    - name: Build and push Docker image (Desarrollo)
-      uses: docker/build-push-action@v4
-      with:
-        context: .
-        push: true
-        # 🏷️ Usar una etiqueta de desarrollo
-        tags: ${{ secrets.DOCKER_USERNAME }}/nginx-app:dev
-        
-    - name: Deploy to development server
-      uses: appleboy/ssh-action@master
-      with:
-        host: ${{ secrets.DEV_SERVER_HOST }} # 🔑 Usar un secreto para el servidor de desarrollo
-        username: ${{ secrets.DEV_SERVER_USERNAME }}
-        key: ${{ secrets.SSH_PRIVATE_KEY }}
-        script: |
-          # ⬇️ Pull de la imagen de desarrollo
-          docker pull ${{ secrets.DOCKER_USERNAME }}/nginx-app:dev
-          # 🛑 Parar y eliminar el contenedor de desarrollo existente
-          docker stop nginx-dev-container || true
-          docker rm nginx-dev-container || true
-          # 🚀 Ejecutar el nuevo contenedor de desarrollo
-          # Podemos exponer un puerto diferente, por ejemplo, 8080, para evitar conflictos
-          docker run -d --name nginx-dev-container -p 8080:80 ${{ secrets.DOCKER_USERNAME }}/nginx-app:dev
+      - name: Checkout repo
+        uses: actions/checkout@v6.0.1
+
+      - name: Build Docker image
+        run: docker build -t web-dev .
+
+      - name: Run container
+        run: docker run -d -p 8080:80 web-dev
